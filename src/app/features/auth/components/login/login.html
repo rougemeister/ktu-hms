@@ -1,0 +1,277 @@
+<div class="auth-container">
+  <div class="auth-card">
+
+    <div class="auth-header">
+      <div class="hospital-branding">
+        <div class="hospital-icon">🏥</div>
+        <div class="hospital-info">
+          <h1>KTU Clinic HMS</h1>
+          <p>Hospital Management System</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-content">
+      <div class="auth-tabs">
+        <button 
+          class="tab-button" 
+          [class.active]="isLoginMode"
+          (click)="switchToLogin()">
+          Sign In
+        </button>
+        <button 
+          class="tab-button" 
+          [class.active]="!isLoginMode"
+          (click)="switchToRegister()">
+          Create Account
+        </button>
+      </div>
+
+      <div class="tab-content" *ngIf="isLoginMode">
+        <h2>Welcome Back</h2>
+        <p class="subtitle">Sign in to access your healthcare dashboard</p>
+
+
+        <div class="alert alert-error" *ngIf="errorMessage">
+          <span class="alert-icon">⚠️</span>
+          {{ errorMessage }}
+        </div>
+        
+        <div class="alert alert-success" *ngIf="successMessage">
+          <span class="alert-icon">✅</span>
+          {{ successMessage }}
+        </div>
+
+        <!-- Login Form -->
+        <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="auth-form">
+          <!-- Role Selection -->
+          <div class="form-group">
+            <label for="login-role">User Role</label>
+            <div class="role-grid">
+              <button
+                *ngFor="let role of roles"
+                type="button"
+                class="role-option"
+                [class.selected]="loginForm.get('role')?.value === role.value"
+                [style.--role-color]="role.color"
+                (click)="loginForm.patchValue({ role: role.value })">
+                <span class="role-icon">{{ role.icon }}</span>
+                <div class="role-text">
+                  <span class="role-label">{{ role.label }}</span>
+                  <small class="role-description">{{ role.description }}</small>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="login-email">Email Address</label>
+            <div class="input-wrapper">
+              <span class="input-icon">📧</span>
+              <input
+                id="login-email"
+                type="email"
+                formControlName="email"
+                placeholder="john@example.com"
+                [class.error]="hasFieldError(loginForm, 'email')">
+            </div>
+            <div class="field-error" *ngIf="hasFieldError(loginForm, 'email')">
+              {{ getFieldError(loginForm, 'email') }}
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔒</span>
+              <input
+                id="login-password"
+                [type]="showPassword ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="••••••••"
+                [class.error]="hasFieldError(loginForm, 'password')">
+              <button
+                type="button"
+                class="toggle-password"
+                (click)="togglePasswordVisibility()">
+                {{ showPassword ? '👁️' : '👁️‍🗨️' }}
+              </button>
+            </div>
+            <div class="field-error" *ngIf="hasFieldError(loginForm, 'password')">
+              {{ getFieldError(loginForm, 'password') }}
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            class="submit-btn"
+            [disabled]="isLoading">
+            <span class="spinner" *ngIf="isLoading"></span>
+            <span *ngIf="!isLoading">Sign In</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Register Form -->
+      <div class="tab-content" *ngIf="!isLoginMode">
+        <h2>Join Our System</h2>
+        <p class="subtitle">Create your account to get started</p>
+
+        <!-- Alert Messages -->
+        <div class="alert alert-error" *ngIf="errorMessage">
+          <span class="alert-icon">⚠️</span>
+          {{ errorMessage }}
+        </div>
+        
+        <div class="alert alert-success" *ngIf="successMessage">
+          <span class="alert-icon">✅</span>
+          {{ successMessage }}
+        </div>
+
+        <!-- Register Form -->
+        <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="auth-form">
+          <!-- Role Selection -->
+          <div class="form-group">
+            <label for="register-role">User Role</label>
+            <div class="role-grid">
+              <button
+                *ngFor="let role of roles"
+                type="button"
+                class="role-option"
+                [class.selected]="registerForm.get('role')?.value === role.value"
+                [style.--role-color]="role.color"
+                (click)="registerForm.patchValue({ role: role.value })">
+                <span class="role-icon">{{ role.icon }}</span>
+                <div class="role-text">
+                  <span class="role-label">{{ role.label }}</span>
+                  <small class="role-description">{{ role.description }}</small>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Name Fields -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="register-firstName">First Name</label>
+              <input
+                id="register-firstName"
+                type="text"
+                formControlName="firstName"
+                placeholder="John"
+                [class.error]="hasFieldError(registerForm, 'firstName')">
+              <div class="field-error" *ngIf="hasFieldError(registerForm, 'firstName')">
+                {{ getFieldError(registerForm, 'firstName') }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="register-lastName">Last Name</label>
+              <input
+                id="register-lastName"
+                type="text"
+                formControlName="lastName"
+                placeholder="Doe"
+                [class.error]="hasFieldError(registerForm, 'lastName')">
+              <div class="field-error" *ngIf="hasFieldError(registerForm, 'lastName')">
+                {{ getFieldError(registerForm, 'lastName') }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="register-email">Email Address</label>
+            <div class="input-wrapper">
+              <span class="input-icon">📧</span>
+              <input
+                id="register-email"
+                type="email"
+                formControlName="email"
+                placeholder="john@example.com"
+                [class.error]="hasFieldError(registerForm, 'email')">
+            </div>
+            <div class="field-error" *ngIf="hasFieldError(registerForm, 'email')">
+              {{ getFieldError(registerForm, 'email') }}
+            </div>
+          </div>
+
+          <!-- Phone -->
+          <div class="form-group">
+            <label for="register-phone">Phone Number</label>
+            <div class="input-wrapper">
+              <span class="input-icon">📱</span>
+              <input
+                id="register-phone"
+                type="tel"
+                formControlName="phoneNumber"
+                placeholder="+233 XX XXX XXXX"
+                [class.error]="hasFieldError(registerForm, 'phoneNumber')">
+            </div>
+            <div class="field-error" *ngIf="hasFieldError(registerForm, 'phoneNumber')">
+              {{ getFieldError(registerForm, 'phoneNumber') }}
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label for="register-password">Password</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔒</span>
+              <input
+                id="register-password"
+                [type]="showPassword ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="••••••••"
+                [class.error]="hasFieldError(registerForm, 'password')">
+              <button
+                type="button"
+                class="toggle-password"
+                (click)="togglePasswordVisibility()">
+                {{ showPassword ? '👁️' : '👁️‍🗨️' }}
+              </button>
+            </div>
+            <div class="field-error" *ngIf="hasFieldError(registerForm, 'password')">
+              {{ getFieldError(registerForm, 'password') }}
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="form-group">
+            <label for="register-confirmPassword">Confirm Password</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔒</span>
+              <input
+                id="register-confirmPassword"
+                [type]="showConfirmPassword ? 'text' : 'password'"
+                formControlName="confirmPassword"
+                placeholder="••••••••"
+                [class.error]="hasFieldError(registerForm, 'confirmPassword')">
+              <button
+                type="button"
+                class="toggle-password"
+                (click)="toggleConfirmPasswordVisibility()">
+                {{ showConfirmPassword ? '👁️' : '👁️‍🗨️' }}
+              </button>
+            </div>
+            <div class="field-error" *ngIf="hasFieldError(registerForm, 'confirmPassword')">
+              {{ getFieldError(registerForm, 'confirmPassword') }}
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            class="submit-btn"
+            [disabled]="isLoading">
+            <span class="spinner" *ngIf="isLoading"></span>
+            <span *ngIf="!isLoading">Create Account</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
